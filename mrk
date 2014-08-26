@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [ "$1" = "clean" ]; then
+   CLEAN_CMD="make clean"
+   CLEAN_ARG="kc"
+fi
+
+mr1kernel $CLEAN_ARG
+sleep 3
+
+mr0kernel $CLEAN_ARG

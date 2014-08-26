@@ -1,0 +1,9 @@
+#!/bin/bash
+clear
+tail ~/download/cmbuild.txt|grep -e UTC | grep -v -e\^\#\#
+echo
+tail ~/download/cmbuild.txt|grep -e KST | grep -v -e\^\#\#
+echo
+cat ~/download/cmbuild_*.txt 2> /dev/null
+grep -e \^\#\# ~/bin/cm_patch.sh | grep -v -e \^\#\! -e MERGED -e 1/2
+echo

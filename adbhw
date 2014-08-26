@@ -1,0 +1,18 @@
+adbroot
+
+case "$(basename $0)" in
+    adbbin) TARGET_PATH=/system/bin ;;
+    adbapp) TARGET_PATH=/system/app ;;
+    adblib) TARGET_PATH=/system/lib ;;
+    adbhw)  TARGET_PATH=/system/lib/hw ;;
+esac
+
+for FILE in $*; do
+    echo -n "push: $TARGET_PATH/$FILE - "
+    adb push $FILE $TARGET_PATH
+    if [ "$TARGET_PATH" = "/system/bin" ]; then
+	adb shell "chmod 755 $TARGET_PATH/$(basename $FILE)"
+    else
+	adb shell "chmod 644 $TARGET_PATH/$(basename $FILE)"
+    fi
+done

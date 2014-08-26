@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ "$#" = "1" ]; then
+    find . -name $1 -exec rm -rf '{}' \;
+fi
+
+if [ "$#" = "2" ]; then
+    cd $1
+    find . -name $2 -exec rm -rf '{}' \;
+fi

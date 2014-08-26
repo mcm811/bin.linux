@@ -1,0 +1,71 @@
+#!/bin/bash
+
+echo "packging hostapd, gralloc, hwcoposer"
+
+LIBMR0=/home/changmin/android/lib_mr0
+LIBMR1=/home/changmin/android/lib_mr1
+
+DLMR0=~/download/cm10mr0
+DLMR1=~/download/cm10mr1
+DK=~/download/kernel
+HW=system/lib/hw
+
+LIB_GRA=gralloc.exynos4.so
+MR0_GRA=mr0.gralloc.exynos4.so
+MR1_GRA=mr1.gralloc.exynos4.so
+LIB_HWC=hwcomposer.exynos4.so
+MR0_HWC=mr0.hwcomposer.exynos4.so
+MR1_HWC=mr1.hwcomposer.exynos4.so
+
+KERNEL=kernel-cm-10.1-$(date -u +%Y%m%d)-MCM-i9100-vsync_sysfs-signed.zip
+ROM=cm-10.1-$(date -u +%Y%m%d)-MCM-i9100-vsync_sysfs.zip
+
+pkg_blob() {
+    cd $DLMR1
+    cp -av $DLMR0/$HW/$LIB_HWC $LIBMR1/$HW/$MR0_HWC
+    cp -av $DLMR1/$HW/$LIB_HWC $LIBMR1/$HW/$MR1_HWC
+    cp -av $DLMR0/$HW/$LIB_GRA $LIBMR1/$HW/$MR0_GRA
+    cp -av $DLMR1/$HW/$LIB_GRA $LIBMR1/$HW/$MR1_GRA
+
+    # cd $DLMR1;7z u $DLMR1/$ROM $HW/$LIB_GRA
+    # cd $DLMR1;7z u $DLMR1/$ROM $HW/$LIB_HWC
+
+    cd $DLMR1;
+    7z a $DLMR1/$ROM \
+	$HW/$MR0_HWC $HW/$MR1_HWC \
+	$HW/$MR0_GRA $HW/$MR1_GRA
+
+    cp -av $DLMR1/$HW/*mr*.so $LIBMR1/$HW/
+    cp -av $DLMR1/system/lib/libskia*.so $LIBMR1/system/lib/
+}
+
+pkg_lib() {
+    cd $LIBMR1;
+    7z u -r $DLMR1/$ROM system
+}
+
+pkg_rom() {
+    cd $DLMR1
+    cp -av ~/android/system_mr1/vendor/cm/prebuilt/common/etc/init.d/21config system/etc/init.d/21config
+    7z u $ROM boot.img system/etc/init.d/21config
+    rm -f *.md5sum; md5sum $ROM | tee $ROM.md5sum
+    [ -f $KERNEL ] && mv -v $KERNEL $DK/
+}
+
+hw_push() {
+    cd $DLMR1
+    adb root;adb remount
+    adb push $HW/$MR0_HWC /$HW/
+    adb push $HW/$MR1_HWC /$HW/
+    adb push $HW/$MR0_GRA /$HW/
+    adb push $HW/$MR1_GRA /$HW/
+}
+
+pkg_blob
+pkg_rom
+
+rm -f ~/android/system_mr1/cm_current.zip
+ln -sv $DLMR1/$ROM ~/android/system_mr1/cm_current.zip
+
+echo "cm_rename A B"
+echo rompush $DLMR1/$ROM

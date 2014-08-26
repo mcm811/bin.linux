@@ -1,0 +1,8 @@
+#!/bin/bash
+
+ADBROOT=$(adb root)
+[ "$ADBROOT" != "adbd is already running as root" ] && sleep 3
+adb remount > /dev/null
+if [ "$#" != "0" ]; then
+    adb shell $@
+fi

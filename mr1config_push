@@ -1,0 +1,5 @@
+#!/bin/bash
+
+adbroot
+adb push ~/android/system_mr1/vendor/cm/prebuilt/common/etc/init.d/21config /system/etc/init.d/21config
+adb shell chmod 755 /system/etc/init.d/21config

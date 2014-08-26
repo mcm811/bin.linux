@@ -1,0 +1,57 @@
+#!/bin/bash
+
+append_remove() {
+    ADBCMD_REMOVE=";. ./kernel_install.sh rm"
+}
+
+append_reboot() {
+    ADBCMD_REBOOT=";echo REBOOT;sleep 3;reboot"
+}
+
+append_recovery() {
+    ADBCMD_REBOOT=";echo REBOOT;sleep 3;reboot recovery"
+}
+
+FILE=$1
+if [ "$#" -ge "2" ]; then
+    if [ "$1" = "rm" ] || [ "$1" = "-rm" ]; then
+	append_remove
+	append_reboot
+	FILE=$2
+    fi
+    if [ "$2" = "rm" ] || [ "$2" = "-rm" ]; then
+	append_remove
+	append_reboot
+    fi
+
+    if [ "$1" = "r" ] || [ "$1" = "-r" ] || [ "$1" = "rr" ]; then
+	append_reboot
+	FILE=$2
+    fi
+    if [ "$2" = "r" ] || [ "$2" = "-r" ] || [ "$2" = "rr" ]; then
+	append_reboot
+    fi
+
+    if [ "$1" = "rc" ] || [ "$1" = "-rc" ]; then
+	append_recovery
+	FILE=$2
+    fi
+    if [ "$2" = "rc" ] || [ "$2" = "-rc" ]; then
+	append_recovery
+    fi
+fi
+
+[ "$#" != "0" ] && FILENAME=$(basename $FILE) || append_reboot
+
+ADBINSTALL="[ -d /sdcard/Download ] && cd /sdcard/Download && [ -d /emmc/Download ] && cd /emmc/Download;. ./kernel_install.sh"
+ADBCMD="$ADBINSTALL $FILENAME"${ADBCMD_REMOVE}${ADBCMD_REBOOT}
+ADBMV="$ADBINSTALL mv"
+
+if [ -n "$FILE" ]; then
+    adb shell su -c "$ADBMV"
+    adbpush $FILE
+else
+    rcmount
+fi
+
+adb shell su -c "$ADBCMD"

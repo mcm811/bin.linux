@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ "$1" = "clean" ]; then
+   CLEAN_CMD="make clean"
+   CLEAN_ARG="kc"
+fi
+
+cd /home/changmin/kernel/siyah-v4/siyahkernel3-jbmali-vsync_sysfs
+$CLEAN_CMD
+./build_kernel.sh no
+sleep 3
+
+cd /home/changmin/kernel/siyah-v5/siyahkernel3
+$CLEAN_CMD
+./build_s2_kernel.sh no

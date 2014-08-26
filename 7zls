@@ -1,0 +1,1 @@
+7z l -slt $* | grep Path | cut -d " " -f3

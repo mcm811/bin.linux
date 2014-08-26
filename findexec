@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ "$#" = "2" ]; then
+    find . -name $1 -exec $2 '{}' \;
+fi
+
+if [ "$#" = "3" ]; then
+    cd $1
+    find . -name $2 -exec $3 '{}' \;
+fi

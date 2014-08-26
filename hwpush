@@ -1,0 +1,29 @@
+#!/bin/bash
+
+MR0=~/download/cm10mr0
+MR1=~/download/cm10mr1
+DK=~/download/kernel
+HW=system/lib/hw
+
+LIB_GRA=gralloc.exynos4.so
+MR0_GRA=mr0.gralloc.exynos4.so
+MR1_GRA=mr1.gralloc.exynos4.so
+LIB_HWC=hwcomposer.exynos4.so
+MR0_HWC=mr0.hwcomposer.exynos4.so
+MR1_HWC=mr1.hwcomposer.exynos4.so
+
+push_lib() {
+    cp -av $MR0/$HW/$LIB_HWC $MR1/$HW/$MR0_HWC
+    cp -av $MR1/$HW/$LIB_HWC $MR1/$HW/$MR1_HWC
+    cp -av $MR0/$HW/$LIB_GRA $MR1/$HW/$MR0_GRA
+    cp -av $MR1/$HW/$LIB_GRA $MR1/$HW/$MR1_GRA
+
+    adbroot
+    adb push $MR1/$HW/$MR0_HWC /$HW/$MR0_HWC
+    adb push $MR1/$HW/$MR1_HWC /$HW/$MR1_HWC
+    adb push $MR1/$HW/$MR0_GRA /$HW/$MR0_GRA
+    adb push $MR1/$HW/$MR1_GRA /$HW/$MR1_GRA
+}
+
+push_lib
+adb reboot

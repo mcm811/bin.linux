@@ -1,0 +1,2 @@
+adbroot
+konsole --new-tab -e adblogcat $* > /dev/null 2>&1

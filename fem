@@ -1,0 +1,3 @@
+NAME=${*%%:}
+echo $NAME
+XMODIFIERS= find . -name $NAME -exec emacs '{}' \; &

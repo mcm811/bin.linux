@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# if [ "$1" = "" ]; then
+#    echo "cm_rename A"
+#    echo "cm_rename B"
+#    echo "cm_rename C"
+#    echo "cm_rename D"
+#    exit 1
+# fi
+
+CMZIP=cm-10-$(date -u +%Y%m%d)*-MCM-i9100-vsync_sysfs.zip
+CMZIP_NEW=cm-10-$(date -u +%Y%m%d)$1-MCM-i9100-vsync_sysfs.zip
+
+cd ~/download/cm10mr0
+ls -l $CMZIP
+
+if [ -f $CMZIP ] && [ ! $CMZIP -ef $CMZIP_NEW ]; then
+    mv $CMZIP $CMZIP_NEW
+    rm $CMZIP.md5sum
+    md5sum $CMZIP_NEW | tee $CMZIP_NEW.md5sum
+    ls -l $CMZIP_NEW
+fi
+
+# if [ -f $CMKERNELZIP ]; then
+#     mv $CMKERNELZIP $CMKERNELZIP_NEW
+# fi

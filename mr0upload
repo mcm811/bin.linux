@@ -1,0 +1,6 @@
+#!/bin/bash
+
+DMD=$(date -u +%Y%m%d);cd ~/download/cm-10;
+scp *$DMD*sysfs*.zip* changmin811@frs.sourceforge.net:/home/frs/project/cm10i9100vsync/cm-10
+
+[ "$1" != "noreadme" ] && scp ~/android/README changmin811@frs.sourceforge.net:/home/frs/project/cm10i9100vsync/

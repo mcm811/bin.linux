@@ -1,0 +1,18 @@
+#!/bin/bash
+
+mali()
+{
+    cd ~/android/system_jbmali;setcm
+    cmsync
+    ./cmb
+}
+
+vsync()
+{
+    cd ~/android/system_vsync;setcm
+    cmsync
+    ./cmb
+}
+
+mali
+vsync

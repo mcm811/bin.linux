@@ -1,0 +1,143 @@
+#!/bin/bash
+
+SYSMR0=/home/changmin/android/system_mr0
+SYSMR1=/home/changmin/android/system_mr1
+
+LIBMR0=/home/changmin/android/lib_mr0
+LIBMR1=/home/changmin/android/lib_mr1
+
+DLMR0=~/download/cm10mr0
+DLMR1=~/download/cm10mr1
+DK=~/download/kernel
+SYSLIB=system/lib
+
+LIB_GRA=gralloc.exynos4.so
+MR0_GRA=mr0.gralloc.exynos4.so
+MR1_GRA=mr1.gralloc.exynos4.so
+LIB_HWC=hwcomposer.exynos4.so
+MR0_HWC=mr0.hwcomposer.exynos4.so
+MR1_HWC=mr1.hwcomposer.exynos4.so
+
+LIB_POW=power.exynos4.so
+DEF_POW=power.exynos4-default.so
+
+LIB_SKIA=libskia.so
+G2D_SKIA=libskia-fimg2d3x.so
+DEF_SKIA=libskia-default.so
+SAM_SKIA=libskia-samsung.so
+
+KERNEL=kernel-cm-10-$(date -u +%Y%m%d)-MCM-i9100-vsync_sysfs-signed.zip
+ROM=cm-10-$(date -u +%Y%m%d)*-MCM-i9100-vsync_sysfs.zip
+
+LIBMR=$LIBMR0
+DLMR=$DLMR0
+SYSMR=$SYSMR0
+
+pkg_cp() {
+    # kernel
+    # cp -a $DLMR/boot.img $LIBMR/
+
+    # config
+    cp -a $SYSMR1/vendor/cm/prebuilt/common/etc/init.d/21config $SYSMR0/vendor/cm/prebuilt/common/etc/init.d/21config 
+    cp -a $SYSMR/vendor/cm/prebuilt/common/etc/init.d/21config $DLMR/system/etc/init.d/
+    cp -a $SYSMR/vendor/cm/prebuilt/common/etc/init.d/21config $LIBMR/system/etc/init.d/
+    chmod 755 $DLMR/system/etc/init.d/* $LIBMR/system/etc/init.d/*
+
+    # gpuwatch gpucat
+    cp -a $SYSMR1/vendor/cm/prebuilt/common/bin/gpu* $SYSMR0/vendor/cm/prebuilt/common/bin/
+    cp -a $SYSMR/vendor/cm/prebuilt/common/bin/gpu* $DLMR/system/bin/
+    cp -a $SYSMR/vendor/cm/prebuilt/common/bin/gpu* $LIBMR/system/bin/
+    chmod 755 $DLMR/system/bin/* $LIBMR/system/bin/*
+
+    # hwcomposer
+    # cp -a $DLMR0/$SYSLIB/hw/$LIB_HWC $LIBMR/$SYSLIB/hw/$MR0_HWC
+    # cp -a $DLMR0/$SYSLIB/hw/$LIB_GRA $LIBMR/$SYSLIB/hw/$MR0_GRA
+
+    # gralloc
+    # cp -a $DLMR1/$SYSLIB/hw/$LIB_HWC $LIBMR/$SYSLIB/hw/$MR1_HWC
+    # cp -a $DLMR1/$SYSLIB/hw/$LIB_GRA $LIBMR/$SYSLIB/hw/$MR1_GRA
+
+    # default
+    # cp -a $DLMR0/$SYSLIB/hw/$LIB_HWC $LIBMR/$SYSLIB/hw/$LIB_HWC
+    # cp -a $DLMR0/$SYSLIB/hw/$LIB_GRA $LIBMR/$SYSLIB/hw/$LIB_GRA
+    # touch $LIBMR/$SYSLIB/hw/$LIB_HWC $LIBMR/$SYSLIB/hw/$LIB_GRA
+
+    # power
+    cp -a $DLMR/$SYSLIB/hw/$LIB_POW $LIBMR/$SYSLIB/hw/$DEF_POW
+
+    # skia
+    cd /home/changmin/android/system_mr0/external/skia
+    skiabranch=$(git branch | grep \* | awk '{ print $2 }')
+    cd -
+    if [ "$skiabranch" = "fimg2d3x" ]; then
+	SKIA=$G2D_SKIA
+    else
+	SKIA=$DEF_SKIA
+    fi
+    cp -av $DLMR/$SYSLIB/$LIB_SKIA $LIBMR/$SYSLIB/$SKIA
+    cp -av $LIBMR/$SYSLIB/$DEF_SKIA $LIBMR/$SYSLIB/$LIB_SKIA
+    touch $LIBMR/$SYSLIB/$LIB_SKIA $LIBMR/$SYSLIB/$SKIA
+
+    chmod 644 $LIBMR/$SYSLIB/*.so $LIBMR/$SYSLIB/hw/*.so
+}
+
+pkg_boot() {
+    if [ ! -f $DLMR/$ROM ]; then
+	return 1
+    fi
+    cd $DLMR;
+    7z u -r0 $DLMR/$ROM \
+	boot.img \
+	system/lib/modules/Si4709_driver.ko \
+	system/lib/modules/cifs.ko \
+	system/lib/modules/dhd.ko \
+	system/lib/modules/j4fs.ko \
+	system/lib/modules/scsi_wait_scan.ko
+}
+
+pkg_system() {
+    if [ ! -f $DLMR/$ROM ]; then
+	return 1
+    fi
+    cd $DLMR; 7z u -r0 $DLMR/$ROM system
+}
+
+pkg_lib() {
+    [ -f $DLMR/$KERNEL ] && mv $DLMR/$KERNEL $DK/
+    if [ ! -f $DLMR/$ROM ]; then
+	echo error
+	return 1
+    fi
+    cd $LIBMR; 7z u -r0 $DLMR/$ROM system
+}
+
+pkg_rm() {
+    echo
+    # 7z d $DLMR/$ROM system/lib/libskia.so
+}
+
+pkg_md5sum() {
+    # echo -n "md5sum: "
+    cd $DLMR
+    rm -f *.md5sum
+    for FILE in $ROM; do
+	# echo $FILE
+	[ -f "$FILE" ] && md5sum $FILE | tee $FILE.md5sum
+    done
+}
+
+pkg_cp
+if [ "$1" = "system" ]; then
+    pkg_system
+fi
+pkg_boot
+pkg_lib
+pkg_rm
+pkg_md5sum
+
+echo
+echo "mr0rename B"
+echo "mr0rename C"
+echo rompush $DLMR/$ROM
+echo mr0upload
+echo 

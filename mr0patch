@@ -1,0 +1,27 @@
+#!/bin/sh
+
+DLMR0=~/download/cm10mr0
+DLMR=$DLMR0
+SYSMR1=/home/changmin/android/system_mr0
+SYSMR=$SYSMR0
+
+PKGPATH="/home/changmin/android/mr0patch"
+PKGNAME="patch-21config-vold-$(date -u +%Y%m%d)-MCM-i9100.zip"
+PKG="$DLMR/$PKGNAME"
+SIGNAPK="/home/changmin/bin/signapk"
+
+build_pkg() {
+    cp -a $SYSMR/vendor/cm/prebuilt/common/etc/init.d/21config $PKGPATH/system/etc/init.d/
+    cp -a $DLMR/system/bin/vold $PKGPATH/system/bin/
+
+    cd $PKGPATH
+    find . -name "*~" -exec rm -f '{}' \+ -printf "%f " -type d -exec chmod 755 '{}' \+ -name *.so -exec chmod 644 '{}' \+ -name *.apk -exec chmod 644 '{}' \+ -name *.sh -exec chmod 755 '{}' \+
+    chmod 755 system/etc/init.d/*
+
+    rm -f $PKG; 7z u -r $PKG * || echo "failed zip" || exit 1
+    $SIGNAPK $PKG
+
+    #7z l -slt $PKG | grep Path | cut -d " " -f3
+}
+
+build_pkg

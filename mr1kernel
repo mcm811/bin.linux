@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# cd /home/changmin/android/system_mr1/out
+# findrm customconfig
+mr1build kernel

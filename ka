@@ -1,0 +1,22 @@
+#!/bin/bash
+
+adb_dev() {
+    ADB_DEV_NUM=0
+    for dev in $(adb devices|grep -v List|awk '{ print $1 }'); do
+	echo "export ANDROID_SERIAL=$dev"
+	echo "adb -s $dev"
+	ADB_DEV_NUM=$(($ADB_DEV_NUM+1))
+    done
+}
+
+for (( ; ; )); do
+    [ "$(adb get-state 2> /dev/null)" = "device" ] && break
+    [ "$(adb root 2> /dev/null)" = "adbd is already running as root" ] && break
+    adb_dev
+    # if [ "$ADB_DEV_NUM" -ge "2" ]; then
+    # 	continue
+    # fi
+    sleep 3
+done
+adbroot
+konsole --new-tab -e adb shell > /dev/null 2>&1

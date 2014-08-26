@@ -1,0 +1,45 @@
+#!/bin/bash
+
+cd /home/changmin/android/system_mr0
+
+if ! [ -e .repo ]; then
+    echo "change to build directory"
+    exit
+fi
+
+. ~/bin/cm_linaro.sh
+change_to_4.7-jbmali-vsync_sysfs
+
+SYNC_FILE=~/download/cmbuild.txt
+
+grep -e 4.7 -e 4.6 -e arm-eabi build/envsetup.sh
+echo $CM_EXTRAVERSION
+
+cmbuild
+sleep 3
+
+START_UTC="START: $(LC_TIME=en date -u)"
+START_KST="시작: $(LC_TIME=ko_KR.UTF-8 date)"
+echo "#########################################" >> $SYNC_FILE
+echo $START_UTC >> $SYNC_FILE
+echo $START_KST >> $SYNC_FILE
+
+cp -av ~/android/system_mr1/vendor/cm/prebuilt/common/etc/init.d/21config ~/android/system_mr0/vendor/cm/prebuilt/common/etc/init.d/21config
+rm -f out/target/product/i9100/system/build.prop
+./build.sh i9100 $1 2>&1 | tee cmb.log
+
+FINISH_UTC="FINISH: $(LC_TIME=en date -u)"
+FINISH_KST="완료: $(LC_TIME=ko_KR.UTF-8 date)"
+
+echo $FINISH_UTC >> $SYNC_FILE
+echo $FINISH_KST >> $SYNC_FILE
+echo "#########################################" >> $SYNC_FILE
+
+grep -e 4.7 -e 4.6 -e arm-eabi build/envsetup.sh
+echo $START_KST
+echo $FINISH_KST
+
+sleep 3
+mr0pkg
+
+kdialog --msgbox "vsync_sysfs: $START_KST $FINISH_KST" &

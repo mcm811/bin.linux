@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo mr1start
+echo repo abandon jellybean .
+
+git branch --list
+for i in $(git branch --list | grep -v \*); do
+    echo "repo start $i .;repo sync .;gk"
+done
+
+/usr/bin/gitk $@ &

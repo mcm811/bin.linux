@@ -1,0 +1,5 @@
+# recovery mount
+
+[ "$(adb get-state)" = "device" ] && exit 0
+
+adb shell su -c "mount /dev/block/mmcblk0p9 /system/;mkdir /sdcard;mount /dev/block/mmcblk0p11 /sdcard" > /dev/null

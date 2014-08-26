@@ -1,0 +1,19 @@
+#!/bin/bash
+
+SYNC_KST_MR0=$(cat ~/android/cmbuild.txt | grep cm-10] | grep sync | grep KST | tail -n 1)
+SYNC_UTC_MR0=$(cat ~/android/cmbuild.txt | grep cm-10] | grep sync | grep UTC | tail -n 1)
+
+SYNC_KST_MR1=$(cat ~/android/cmbuild.txt | grep cm-10.1 | grep sync | grep KST | tail -n 1)
+SYNC_UTC_MR1=$(cat ~/android/cmbuild.txt | grep cm-10.1 | grep sync | grep UTC | tail -n 1)
+
+echo $SYNC_KST_MR0
+echo $SYNC_KST_MR1
+echo
+echo $SYNC_UTC_MR0
+echo $SYNC_UTC_MR1
+echo
+
+# sed -i \
+#     -e "s/\[cm-10\] repo.*/$SYNC_UTC_MR0/g" \
+#     -e "s/\[cm-10\.1\] repo.*/$SYNC_UTC_MR1/g" \
+#     ~/android/README

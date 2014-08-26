@@ -1,0 +1,25 @@
+#!/bin/sh
+
+DLMR1=~/download/cm10mr1
+DLMR=$DLMR1
+
+PKGPATH="/home/changmin/android/lib_mr1"
+PKGVER="10.1"
+PKGNAME="patch-${PKGVER}-$(date -u +%Y%m%d)-MCM-i9100-vsync_sysfs.zip"
+PKG="$DLMR/$PKGNAME"
+SIGNAPK="/home/changmin/bin/signapk"
+
+build_pkg() {
+    cd $PKGPATH
+    #find . -name "*~" -exec rm -f '{}' \+ -printf "%f "
+    #find . -type d -exec chmod 755 '{}' \+ -type f -exec chmod 644 '{}' \+
+    find . -name "*~" -exec rm -f '{}' \+ -printf "%f " -type d -exec chmod 755 '{}' \+ -name *.so -exec chmod 644 '{}' \+ -name *.apk -exec chmod 644 '{}' \+ -name *.sh -exec chmod 755 '{}' \+
+    chmod 755 system/etc/init.d/*
+
+    rm -f $PKG; 7z u -r $PKG * || echo "failed zip" || exit 1
+    $SIGNAPK $PKG
+
+    #7z l -slt $PKG | grep Path | cut -d " " -f3
+}
+
+build_pkg

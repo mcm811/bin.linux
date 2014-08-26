@@ -1,0 +1,7 @@
+#!/bin/bash
+
+for cmd in kupload mr0upload mr1upload; do
+    $cmd noreadme
+    sleep 3
+done
+scp ~/android/README changmin811@frs.sourceforge.net:/home/frs/project/cm10i9100vsync/
