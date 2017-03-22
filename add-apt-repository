@@ -1,1 +1,3 @@
 #ubuntu
+sudo add-apt-repository ppa:ubuntu-mozilla-daily/ppa
+sudo add-apt-repository ppa:graphics-drivers/ppa
