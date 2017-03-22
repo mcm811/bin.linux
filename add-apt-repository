@@ -1,3 +1,5 @@
-#ubuntu
+#mozilla nightly build
 sudo add-apt-repository ppa:ubuntu-mozilla-daily/ppa
+
+#nvidia driver
 sudo add-apt-repository ppa:graphics-drivers/ppa
