@@ -3,3 +3,6 @@ sudo add-apt-repository ppa:ubuntu-mozilla-daily/ppa
 
 #nvidia driver
 sudo add-apt-repository ppa:graphics-drivers/ppa
+
+#virtualbox guest
+sudo apt-get install virtualbox-guest-dkms 
